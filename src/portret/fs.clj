@@ -1,6 +1,7 @@
 (ns portret.fs
   (:require [multihash.digest :as digest]
-            [portret.config :as config]))
+            [portret.config :as config]
+            [clj-http.client :as client]))
 
 (defn store-path-for-uri
   "Calculate a relative path using a sha1 sum for the URI."
@@ -20,15 +21,22 @@
     (println (str "Exists: " (.getAbsolutePath file)))
     (.exists file)))
 
-;(store-path-for-uri "https://www.google.co.za")
-;(uri-available? "https://www.google.co.za")
-
-;(@config/app-config :fs-cache)
-
 (defn ensure-cache-dir-available! [uri]
   (let [cache-dir (.getParentFile (uri-cache-file uri))]
     (if-not (.exists cache-dir) (.mkdirs cache-dir))
     (.exists cache-dir)))
 
-;(ensure-cache-dir-available! "foo bar baz")
+(defn- fetch-uri [uri]
+  (client/get uri {:as :byte-array}))
+
+(defn- write-to-disk [uri byte-array]
+  (ensure-cache-dir-available! uri)
+  (.write (java.io.FileOutputStream. (uri-cache-file uri)) byte-array))
+
+(defn get-uri-resource [uri]
+  (if-not (uri-available? uri)
+    (write-to-disk uri (:body (fetch-uri uri))))
+  (uri-cache-file uri))
+
+;(get-uri-resource "http://localhost:8000/zmr-pids.png")
 
