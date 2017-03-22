@@ -38,5 +38,18 @@
     (write-to-disk uri (:body (fetch-uri uri))))
   (uri-cache-file uri))
 
-;(get-uri-resource "http://localhost:8000/zmr-pids.png")
+
+(defn- do-cmd [cmd & args]
+  ;(println (str "args: " args))
+  (let [cmdargs (into-array String (cons cmd  args))
+        ;_ (println (str "cmdargs: " cmdargs))
+        p (.exec (Runtime/getRuntime) cmdargs)]
+    (slurp (.getInputStream p))))
+
+(defn uri-mime [uri]
+  (do-cmd "file" "-i" (.getAbsolutePath (uri-cache-file uri))))
+
+;(t "http://localhost:8000/zmr-pids.png")
+
+
 
