@@ -1,6 +1,8 @@
 (ns portret.fs
-  (:require [multihash.digest :as digest]
+  (:require [clojure.data.json :as json]
+            [multihash.digest :as digest]
             [portret.config :as config]
+            [portret.osio :as osio]
             [clj-http.client :as client]))
 
 (defn store-path-for-uri
@@ -38,18 +40,16 @@
     (write-to-disk uri (:body (fetch-uri uri))))
   (uri-cache-file uri))
 
-
-(defn- do-cmd [cmd & args]
-  ;(println (str "args: " args))
-  (let [cmdargs (into-array String (cons cmd  args))
-        ;_ (println (str "cmdargs: " cmdargs))
-        p (.exec (Runtime/getRuntime) cmdargs)]
-    (slurp (.getInputStream p))))
+(defn uri-exif
+  "Pulls EXIF data from the resource at the specified URI."
+  [uri]
+  (let [f (get-uri-resource uri)
+        file-path (.getAbsolutePath f)]
+    (nth (json/read-str (osio/execute "exiftool" "-json" file-path) :key-fn keyword) 0)))
 
 (defn uri-mime [uri]
-  (do-cmd "file" "-i" (.getAbsolutePath (uri-cache-file uri))))
+  (:MIMEType (uri-exif uri)))
 
-;(t "http://localhost:8000/zmr-pids.png")
+;(uri-mime "http://localhost:8000/zmr-pids.png")
 
-
-
+;(:MIMEType (uri-exif "http://localhost:8000/zmr-pids.png"))
