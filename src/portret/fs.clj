@@ -13,17 +13,17 @@
         pre-path (reduce #(str %1 "/" %2) pre-path-parts)]
     (str pre-path "/" s1uri)))
 
-(defn uri-cache-file [uri]
+(defn- uri-cache-file [uri]
   (java.io.File. (@config/app-config :fs-cache) (store-path-for-uri uri)))
 
-(defn uri-available?
+(defn- uri-available?
   "Determine if the bytes for a URI have been stored before."
   [uri]
   (let [file (uri-cache-file uri)]
     (println (str "Exists: " (.getAbsolutePath file)))
     (.exists file)))
 
-(defn ensure-cache-dir-available! [uri]
+(defn- ensure-cache-dir-available! [uri]
   (let [cache-dir (.getParentFile (uri-cache-file uri))]
     (if-not (.exists cache-dir) (.mkdirs cache-dir))
     (.exists cache-dir)))
@@ -36,6 +36,8 @@
   (.write (java.io.FileOutputStream. (uri-cache-file uri)) byte-array))
 
 (defn get-uri-resource [uri]
+  "Retrieves (downloads and caches to disk if required)
+   resource and returns the file location."
   (if-not (uri-available? uri)
     (write-to-disk uri (:body (fetch-uri uri))))
   (uri-cache-file uri))
@@ -48,6 +50,7 @@
     (nth (json/read-str (osio/execute "exiftool" "-json" file-path) :key-fn keyword) 0)))
 
 (defn uri-mime [uri]
+  "Pulls MIME type for the given URI."
   (:MIMEType (uri-exif uri)))
 
 ;(uri-mime "http://localhost:8000/zmr-pids.png")
