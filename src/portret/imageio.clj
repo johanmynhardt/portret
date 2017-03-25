@@ -39,12 +39,13 @@
   [uri output-dims start-coords crop-dims]
   (let [in-file (fs/get-uri-resource uri)
         dimsstr (dims-str output-dims)
-        dest-file (op-dest-file uri (str "crop_") output-dims)]
+        cropstr (crop-str crop-dims start-coords)
+        dest-file (op-dest-file uri (str "crop_" cropstr) output-dims)]
     (if-not
         (.exists dest-file)
       (let [
             cv (osio/execute "convert"
-                             "-crop" (crop-str crop-dims start-coords)
+                             "-crop" cropstr
                              "-resize" dimsstr (.getAbsolutePath in-file)
                              (.getAbsolutePath dest-file))]
         dest-file)
