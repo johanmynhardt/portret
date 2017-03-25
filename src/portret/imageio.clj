@@ -46,7 +46,8 @@
       (let [
             cv (osio/execute "convert"
                              "-crop" cropstr
-                             "-resize" dimsstr (.getAbsolutePath in-file)
+                             "-resize" dimsstr
+                             (.getAbsolutePath in-file)
                              (.getAbsolutePath dest-file))]
         dest-file)
       dest-file)))
@@ -56,6 +57,6 @@
 ;(dims-str {:width 1 :height 20})
 (crop "http://localhost:8000/zmr-pids.png"
       {:width 400 :height 400}
-      {:x 0 :y 0}
+      {:x 2000 :y 800}
       {:width 800 :height 800})
 
