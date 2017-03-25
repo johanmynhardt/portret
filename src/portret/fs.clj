@@ -3,7 +3,8 @@
             [multihash.digest :as digest]
             [portret.config :as config]
             [portret.osio :as osio]
-            [clj-http.client :as client]))
+            [clj-http.client :as client])
+  (:import (java.io File FileOutputStream)))
 
 (defn store-path-for-uri
   "Calculate a relative path using a sha1 sum for the URI."
@@ -14,7 +15,7 @@
     (str pre-path "/" s1uri)))
 
 (defn- uri-cache-file [uri]
-  (java.io.File. (@config/app-config :fs-cache) (store-path-for-uri uri)))
+  (File. (@config/app-config :fs-cache) (store-path-for-uri uri)))
 
 (defn- uri-available?
   "Determine if the bytes for a URI have been stored before."
@@ -33,11 +34,13 @@
 
 (defn- write-to-disk [uri byte-array]
   (ensure-cache-dir-available! uri)
-  (.write (java.io.FileOutputStream. (uri-cache-file uri)) byte-array))
+  (.write (FileOutputStream. (uri-cache-file uri)) byte-array))
 
-(defn get-uri-resource [uri]
-  "Retrieves (downloads and caches to disk if required)
-   resource and returns the file location."
+(defn get-uri-resource
+    "Retrieves (downloads and caches to disk if required) 
+     resource and returns the file location."
+    [uri]
+
   (if-not (uri-available? uri)
     (write-to-disk uri (:body (fetch-uri uri))))
   (uri-cache-file uri))
@@ -47,10 +50,12 @@
   [uri]
   (let [f (get-uri-resource uri)
         file-path (.getAbsolutePath f)]
-    (nth (json/read-str (osio/execute "exiftool" "-json" file-path) :key-fn keyword) 0)))
+    (nth (json/read-str (osio/execute "exiftool" "-json" file-path)
+                        :key-fn keyword) 0)))
 
-(defn uri-mime [uri]
+(defn uri-mime
   "Pulls MIME type for the given URI."
+  [uri]
   (:MIMEType (uri-exif uri)))
 
 ;(uri-mime "http://localhost:8000/zmr-pids.png")
