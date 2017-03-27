@@ -37,6 +37,7 @@
   "Crop the given URI starting at start-coords with
    the crop-dims and output to output-dims size."
   [uri output-dims start-coords crop-dims]
+  (println (str "output: " output-dims ", start-coords: " start-coords ", crop-dims: " crop-dims))
   (let [in-file (fs/get-uri-resource uri)
         dimsstr (dims-str output-dims)
         cropstr (crop-str crop-dims start-coords)

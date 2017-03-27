@@ -5,7 +5,7 @@
             [portret.osio :as osio]
             [clj-http.client :as client]
             [clojure.java.io :as io])
-  (:import (java.io.FileOutputStream)))
+  (:import (java.io FileOutputStream)))
 
 (defn store-path-for-uri
   "Calculate a relative path using a sha1 sum for the URI."
