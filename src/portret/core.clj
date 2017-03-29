@@ -47,5 +47,7 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Starting jetty...")
-  (run-jetty (handler/site app-routes) {:port 3000}))
+  (let [port (get-in @portret.config/app-config [:server :port])]
+    (println (str "Starting jetty or port " port))
+    (run-jetty (handler/site app-routes)
+               {:port port})))
