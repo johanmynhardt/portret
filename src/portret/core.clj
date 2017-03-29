@@ -29,18 +29,20 @@
        [dims source]
        (str "dims: " dims ", source: " source)
        (imageio/resize source (parse-dims dims)))
-  (GET "/crop/:output-dims/c/:crop-dims/s/:source"
-       [output-dims crop-dims source offset]
-       (comment  (println (str "output: " output-dims
+  (GET "/crop/:dims/c/:crop-dims/s/:source"
+       [dims crop-dims source offset]
+       (comment  (println (str "output: " dims
                                ", crop: " crop-dims
                                ", source: " source
                                ", offset: " offset)))
        (imageio/crop source
-                     (parse-dims output-dims)
-                     (if offset (parse-coords offset)
-                         {:x 0 :y 0})
-                     (parse-dims crop-dims)
-                     )))
+                     (parse-dims dims)
+                     (if offset (parse-coords offset) {:x 0 :y 0})
+                     (parse-dims crop-dims)))
+  (GET "/exif/s/:source" [source]
+       {:status 200
+        :headers {"Content-Type" "application/json"}
+        :body (clojure.data.json/write-str (imageio/exif source))}))
 
 (defn -main
   "I don't do a whole lot ... yet."

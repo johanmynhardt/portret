@@ -55,13 +55,13 @@
   [uri]
   (let [f (get-uri-resource uri)
         file-path (.getAbsolutePath f)]
-    (nth (json/read-str (osio/execute "exiftool" "-json" file-path)
+    (nth (json/read-str (osio/execute "exiftool" "-json" "-g" file-path)
                         :key-fn keyword) 0)))
 
 (defn uri-mime
   "Pulls MIME type for the given URI."
   [uri]
-  (:MIMEType (uri-exif uri)))
+  (get-in (uri-exif uri) [:File :MIMEType]))
 
 ;(uri-mime "http://localhost:8000/zmr-pids.png")
 

@@ -53,11 +53,14 @@
         dest-file)
       dest-file)))
 
+(defn exif [uri]
+  (fs/uri-exif uri))
+
 ;(resize "http://localhost:8000/zmr-pids.png" {:width 200 :height 200})
 
 ;(dims-str {:width 1 :height 20})
-(crop "http://localhost:8000/zmr-pids.png"
-      {:width 400 :height 400}
-      {:x 2000 :y 800}
-      {:width 800 :height 800})
+(comment  (crop "http://localhost:8000/zmr-pids.png"
+                {:width 400 :height 400}
+                {:x 2000 :y 800}
+                {:width 800 :height 800}))
 
