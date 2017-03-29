@@ -5,17 +5,20 @@
             [compojure.handler :as handler])
   (:gen-class))
 
-(defn app-handler [request]
+(defn app-handler
+  [request]
   {:status 200
    :headers {"Content-Type" "text/plain"}
    :body (str request)})
 
-(defn- parse-dims [dimstr]
+(defn- parse-dims
+  [dimstr]
   (let [parsed (re-matches #"(\d+)x(\d+)" dimstr)
         ints (map #(Integer/parseInt %) (filter #(re-matches #"\d+" %) parsed))]
     {:width (nth ints 0) :height (nth ints 1)}))
 
-(defn- parse-coords [coordstr]
+(defn- parse-coords
+  [coordstr]
   (let [parsed (re-matches #"(\d+):(\d+)" coordstr)
         ints (map #(Integer/parseInt %) (filter #(re-matches #"\d+" %) parsed))]
     {:x (nth ints 0) :y (nth ints 1)}))

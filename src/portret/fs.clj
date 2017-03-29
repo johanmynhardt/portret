@@ -29,22 +29,25 @@
     (println (str "Exists: " (.getAbsolutePath file)))
     (.exists file)))
 
-(defn- ensure-cache-dir-available! [uri]
+(defn- ensure-cache-dir-available!
+  [uri]
   (let [cache-dir (.getParentFile (uri-cache-file uri))]
     (if-not (.exists cache-dir) (.mkdirs cache-dir))
     (.exists cache-dir)))
 
-(defn- fetch-uri [uri]
+(defn- fetch-uri
+  [uri]
   (client/get uri {:as :byte-array}))
 
-(defn- write-to-disk [uri byte-array]
+(defn- write-to-disk
+  [uri byte-array]
   (ensure-cache-dir-available! uri)
   (.write (FileOutputStream. (uri-cache-file uri)) byte-array))
 
 (defn get-uri-resource
-    "Retrieves (downloads and caches to disk if required) 
-     resource and returns the file location."
-    [uri]
+  "Retrieves (downloads and caches to disk if required) 
+  resource and returns the file location."
+  [uri]
 
   (if-not (uri-available? uri)
     (write-to-disk uri (:body (fetch-uri uri))))

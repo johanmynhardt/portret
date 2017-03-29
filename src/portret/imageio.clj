@@ -3,7 +3,8 @@
             [portret.osio :as osio]
             [clojure.java.io :as io]))
 
-(defn- dims-str [{:keys [width height]}]
+(defn- dims-str
+  [{:keys [width height]}]
   (str width "x" height))
 
 (defn- op-dest-location
@@ -53,7 +54,8 @@
         dest-file)
       dest-file)))
 
-(defn exif [uri]
+(defn exif
+  [uri]
   (fs/uri-exif uri))
 
 ;(resize "http://localhost:8000/zmr-pids.png" {:width 200 :height 200})
