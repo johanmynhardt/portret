@@ -18,14 +18,17 @@
 
 (defn resize
   "Resize the given URI to the requested dimensions."
-  [uri dims]
+  [uri dims sizing]
   (let [in-file (fs/get-uri-resource uri)
-        dest-file (op-dest-file uri "resize" dims)]
+        dest-file (op-dest-file uri (str "resize-" sizing) dims)]
     (if-not
         (.exists dest-file)
       (let [dimsstr (dims-str dims)
             cv (osio/execute
-                "convert" "-resize" dimsstr
+                "convert" "-resize" (str dimsstr (if (= sizing "cover") "^" ">"))
+                "-gravity" "center"
+                (if (= sizing "cover") "-extent")
+                (if (= sizing "cover") dimsstr)
                 (.getAbsolutePath in-file)
                 (.getAbsolutePath dest-file))]
         dest-file)
