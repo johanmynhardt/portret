@@ -30,14 +30,9 @@
        (str "hello, " name))
   (GET "/resize/:dims/s/:source"
        [dims source sizing]
-       (str "dims: " dims ", source: " source ", sizing: " sizing)
        (imageio/resize source (parse-dims dims) (if sizing sizing "contain")))
   (GET "/crop/:dims/c/:crop-dims/s/:source"
        [dims crop-dims source offset]
-       (comment  (println (str "output: " dims
-                               ", crop: " crop-dims
-                               ", source: " source
-                               ", offset: " offset)))
        (imageio/crop source
                      (parse-dims dims)
                      (if offset (parse-coords offset) {:x 0 :y 0})
