@@ -34,24 +34,33 @@
         dest-file)
       dest-file)))
 
-(defn crop-str [{:keys [width height]} {:keys [x y]}]
-  (str width "x" height "+" x "+" y))
+(defn crop-str
+  "Calculate the crop string, which is an ImagaMagick geometry.
+   Here we'll use 'widthxheight(-|+)x(-|+)y'."
+  [{:keys [width height]} {:keys [x y]}]
+  (let [offset-sign (fn [in] (if (> in -1) "+" ""))]
+    (str width "x" height
+       (offset-sign x) x
+       (offset-sign y) y)))
 
 (defn crop
   "Crop the given URI starting at start-coords with
    the crop-dims and output to output-dims size."
-  [uri output-dims start-coords crop-dims]
+  [uri output-dims start-coords crop-dims sizing]
   (println (str "output: " output-dims ", start-coords: " start-coords ", crop-dims: " crop-dims))
   (let [in-file (fs/get-uri-resource uri)
         dimsstr (dims-str output-dims)
         cropstr (crop-str crop-dims start-coords)
-        dest-file (op-dest-file uri (str "crop_" cropstr) output-dims)]
+        dest-file (op-dest-file uri (str "crop_" cropstr "-" sizing) output-dims)]
     (if-not
         (.exists dest-file)
       (let [
             cv (osio/execute "convert"
                              "-crop" cropstr
-                             "-resize" dimsstr
+                             "-resize" (str dimsstr (if (= sizing "cover") "^" ">"))
+                             "-gravity" "center"
+                             (if (= sizing "cover") "-extent")
+                             (if (= sizing "cover") dimsstr)
                              (.getAbsolutePath in-file)
                              (.getAbsolutePath dest-file))]
         dest-file)

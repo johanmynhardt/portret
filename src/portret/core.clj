@@ -19,9 +19,10 @@
 
 (defn- parse-coords
   [coordstr]
-  (let [parsed (re-matches #"(\d+):(\d+)" coordstr)
-        ints (map #(Integer/parseInt %) (filter #(re-matches #"\d+" %) parsed))]
+  (let [parsed (re-matches #"(-?\d+):(-?\d+)" coordstr)
+        ints (map #(Integer/parseInt %) (filter #(re-matches #"-?\d+" %) parsed))]
     {:x (nth ints 0) :y (nth ints 1)}))
+
 
 (defroutes app-routes
   (GET "/" [] "PONG!")
@@ -32,11 +33,12 @@
        [dims source sizing]
        (imageio/resize source (parse-dims dims) (if sizing sizing "contain")))
   (GET "/crop/:dims/c/:crop-dims/s/:source"
-       [dims crop-dims source offset]
+       [dims crop-dims source offset sizing]
        (imageio/crop source
                      (parse-dims dims)
                      (if offset (parse-coords offset) {:x 0 :y 0})
-                     (parse-dims crop-dims)))
+                     (parse-dims crop-dims)
+                     (if sizing sizing "contain")))
   (GET "/exif/s/:source" [source]
        {:status 200
         :headers {"Content-Type" "application/json"}
