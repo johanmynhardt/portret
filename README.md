@@ -22,12 +22,12 @@ Running the server:
 
 ### Crop
 
- `/crop/:dims/c/:crop-dims/s/:source[?offset=x:y]`
+ `/crop/:dims/c/:crop-dims/s/:source[?offset=x:y&sizing=(contain|cover)]`
 
 * `:dims`: dimensions
 * `:crop-dims`: crop dimensions
 * `:source`: encoded source URL
-* `offset`: offset from top-left corner, eg.: `50:50`
+* `offset`: offset from center, eg.: `50:50` or `-100:0`
 
 ## Examples
 
