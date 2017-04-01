@@ -26,7 +26,7 @@
   "Determine if the bytes for a URI have been stored before."
   [uri]
   (let [file (uri-cache-file uri)]
-    (println (str "Exists: " (.getAbsolutePath file)))
+    ;(println (str "Exists: " (.getAbsolutePath file)))
     (.exists file)))
 
 (defn- ensure-cache-dir-available!
@@ -48,10 +48,12 @@
   "Retrieves (downloads and caches to disk if required) 
   resource and returns the file location."
   [uri]
-
-  (if-not (uri-available? uri)
-    (write-to-disk uri (:body (fetch-uri uri))))
-  (uri-cache-file uri))
+  (let [file (uri-cache-file uri)]
+    (if-not (uri-available? uri)
+      (do 
+        (println (str "storing to " file ", URI: " uri))
+        (write-to-disk uri (:body (fetch-uri uri)))))
+    file))
 
 (defn uri-exif
   "Pulls EXIF data from the resource at the specified URI."
