@@ -2,7 +2,8 @@
   (:use ring.adapter.jetty
         compojure.core)
   (:require [portret.imageio :as imageio]
-            [compojure.handler :as handler])
+            [compojure.handler :as handler]
+            [portret.pages :as pages])
   (:gen-class))
 
 (defn app-handler
@@ -25,10 +26,7 @@
 
 
 (defroutes app-routes
-  (GET "/" [] "PONG!")
-  (GET "/:name"
-       [name]
-       (str "hello, " name))
+  (GET "/" [] (str pages/home))
   (GET "/resize/:dims/s/:source"
        [dims source sizing]
        (imageio/resize source (parse-dims dims) (if sizing sizing "contain")))
@@ -42,7 +40,9 @@
   (GET "/exif/s/:source" [source]
        {:status 200
         :headers {"Content-Type" "application/json"}
-        :body (clojure.data.json/write-str (imageio/exif source))}))
+        :body (clojure.data.json/write-str (imageio/exif source))})
+  (GET "/help" []
+       (str pages/help)))
 
 (defn -main
   "I don't do a whole lot ... yet."

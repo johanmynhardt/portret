@@ -12,6 +12,8 @@
                  [clj-http "2.3.0"]
                  [mvxcvi/multihash "2.0.1"]
                  [org.clojure/data.json "0.2.6"]
+
+                 [hiccup "1.0.5"]
                  ;[]
                  ]
   :main ^:skip-aot portret.core
