@@ -1,0 +1,32 @@
+.warn {
+  background-color: pink;
+}
+
+html {
+  font-family: sans-serif;
+}
+
+h1 {
+  border-bottom: 1px solid black;
+}
+
+div.notice-dialog {
+  border-radius: 0.5em;
+  border: 1px solid #ccc;
+  padding: 0;
+  margin: 0.5em;
+  box-shadow: 0 0px 7px 5px rgba(0, 0, 0, 0.1);
+}
+
+div.notice-dialog>h1.heading {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  padding: 0.3em;
+  margin: 0;
+  background-color: #eee;
+}
+
+div.notice-dialog>div.content {
+  margin: 0;
+  padding: 0.3em;
+}
