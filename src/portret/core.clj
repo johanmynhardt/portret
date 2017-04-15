@@ -44,6 +44,8 @@
         :body (clojure.data.json/write-str (imageio/exif source))})
   (GET "/help" []
        (pages/help))
+  (GET "/generate" request
+       (pages/generate (:query-params request)))
   (route/files "/assets" {:root "assets"})
   (route/not-found (fn [req]
                      (println (str "not found: " (:uri req)))
