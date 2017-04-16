@@ -14,6 +14,15 @@ Running the server:
 
 ## ENDPOINTS
 
+### URI Configuration
+The URI scheme uses encoded strings in the path. This is not supported out of the box and requires configuration.
+
+Both Tomcat and Apache HTTPd or Nginx would require this to be enabled.
+
+Tomcat: in `catalina.properties`:
+
+    org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
+
 ### Resize
  `/resize/:dims/s/:source[?sizing=(contain|cover)]`
 
