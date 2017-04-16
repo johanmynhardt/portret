@@ -48,6 +48,7 @@
   (GET "/generate" request
        (pages/generate request))
   (route/files "/assets" {:root "assets"})
+  (route/resources "/")
   (route/not-found (fn [req]
                      (println (str "not found: " (:uri req)))
                      (println (str "req: " req))
