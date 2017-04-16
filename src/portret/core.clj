@@ -1,6 +1,7 @@
 (ns portret.core
   (:use ring.adapter.jetty
-        compojure.core)
+        compojure.core
+        [hiccup.middleware :only (wrap-base-url)])
   (:require [portret.imageio :as imageio]
             [portret.pages :as pages]
             [compojure.handler :as handler]
@@ -27,7 +28,7 @@
 
 
 (defroutes app-routes
-  (GET "/" [] (pages/home))
+  (GET "/" request (pages/home request))
   (GET "/resize/:dims/s/:source"
        [dims source sizing]
        (imageio/resize source (parse-dims dims) (if sizing sizing "contain")))
@@ -42,19 +43,24 @@
        {:status 200
         :headers {"Content-Type" "application/json"}
         :body (clojure.data.json/write-str (imageio/exif source))})
-  (GET "/help" []
-       (pages/help))
+  (GET "/help" request
+       (pages/help request))
   (GET "/generate" request
-       (pages/generate (:query-params request)))
+       (pages/generate request))
   (route/files "/assets" {:root "assets"})
   (route/not-found (fn [req]
                      (println (str "not found: " (:uri req)))
+                     (println (str "req: " req))
                      (pages/not-found req))))
+
+(def app
+  (-> (handler/site app-routes)
+      (wrap-base-url)))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
   (let [port (get-in @portret.config/app-config [:server :port])]
     (println (str "Starting jetty or port " port))
-    (run-jetty (handler/site app-routes)
+    (run-jetty app
                {:port port})))

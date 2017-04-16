@@ -19,4 +19,8 @@
   :main ^:skip-aot portret.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
-  :repositories [["local" "file:lib"]])
+  :repositories [["local" "file:lib"]]
+  :plugins [[lein-ring "0.11.0"]]
+  :ring {:handler portret.core/app
+         :auto-reload? true}
+  )

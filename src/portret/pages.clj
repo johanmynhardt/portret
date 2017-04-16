@@ -1,12 +1,19 @@
 (ns portret.pages
-  (:use [hiccup.core]))
+  (:use [hiccup.core]
+        [hiccup.page]))
+
+(defn- wrap-context-path
+  [request path]
+  (if-let [context (:servlet-context-path request)]
+    (str context path)
+    path))
 
 (defn- page
-  [content]
+  [request content]
   (str (html [:html
               [:head
-               [:link {:rel "stylesheet" :href "/assets/styles/default.css"}]]
-              [:body [:a {:href "/"} "/"] content]])))
+               (hiccup.page/include-css "/assets/styles/default.css")]
+              [:body [:a {:href (wrap-context-path request "/")} "/"] content]])))
 
 (defn- section
   [heading content]
@@ -15,46 +22,46 @@
    [:div {:class "content"} content]])
 
 (defn home
-  []
-  (page
+  [request]
+  (page request
    (section "Portret 0.1.0"
                   (list [:p "See:"]
-                        [:a {:href "/help"} "/help"]))))
+                        [:a {:href (wrap-context-path request "/help")} "/help"]))))
 
 
 (defn help
-  []
-  (page
+  [request]
+  (page request
    (section "Help" 
                   (list [:p "The following endpoints are available"]
                         [:ul
                          [:li [:code "/resize/:dims/s/:source?sizing=(cover|contain)"]]
                          [:li [:code (str "/crop/:dims/c/crop-dims/s/:source?sizing=(cover|contain)&offset=x:y")]]
                          [:li [:code "/exif/s/:source"]]
-                         [:li [:a {:href "/generate"} [:code "/generate"]]]]))))
+                         [:li [:a {:href (wrap-context-path request "/generate")} [:code "/generate"]]]]))))
 
 (defn generate
-  [query-params]
-  (println (str "generate: Got request: " query-params))
-  (page
+  [request]
+  (println (str "generate: Got request: " (:query-params request)))
+  (page request
    (section
     "Generate"
     (list [:p "Use the following form to generate a URL"]
-          [:form {:action "/generate"} 
+          [:form {:action (wrap-context-path request "/generate")}
            [:label "Source"]
            [:input {:type "text" :name "source"}]
            [:button {:type "submit"} "Submit"]]
-          (if-let [source (get query-params "source")]
+          (if-let [source (get (:query-params request) "source")]
             (let [link (str "/resize/" "150x150" "/s/" (java.net.URLEncoder/encode source))]
               [:div
-               [:em "Got source, link for the image: " [:a {:href link} [:code link]]]
+               [:em "Got source, link for the image: " [:a {:href (wrap-context-path request link)} [:code link]]]
                [:br]
-               [:img {:src link}]
+               [:img {:src (wrap-context-path request link)}]
                ]))))))
 
 
 (defn not-found
   [req]
-  (page 
-   (section "Not Found! ¯\\_(ツ)_/¯ "
+  (page req
+   (section "¯\\_(ツ)_/¯ HTTP/404"
                   (str (html [:p "Resource " [:em (:uri req)] " is unavailable."])))))
