@@ -1,6 +1,9 @@
 (ns portret.pages
   (:use [hiccup.core]
-        [hiccup.page]))
+        [hiccup.page])
+  (:require [hiccup.util :as util]
+            [hiccup.element :as element]
+            [hiccup.form :as form]))
 
 (defn- wrap-context-path
   [request path]
@@ -12,8 +15,10 @@
   [request content]
   (str (html [:html
               [:head
-               (hiccup.page/include-css "/assets/styles/default.css")]
-              [:body [:a {:href (wrap-context-path request "/")} "/"] content]])))
+               (hiccup.page/include-css "/css/default.css")]
+              [:body
+               (element/link-to "/" "/")
+               content]])))
 
 (defn- section
   [heading content]
@@ -26,7 +31,7 @@
   (page request
    (section "Portret 0.1.0"
                   (list [:p "See:"]
-                        [:a {:href (wrap-context-path request "/help")} "/help"]))))
+                        (element/link-to "/help" "/help")))))
 
 
 (defn help
@@ -38,7 +43,7 @@
                          [:li [:code "/resize/:dims/s/:source?sizing=(cover|contain)"]]
                          [:li [:code (str "/crop/:dims/c/crop-dims/s/:source?sizing=(cover|contain)&offset=x:y")]]
                          [:li [:code "/exif/s/:source"]]
-                         [:li [:a {:href (wrap-context-path request "/generate")} [:code "/generate"]]]]))))
+                         [:li (element/link-to "/generate" "/generate")]]))))
 
 (defn generate
   [request]
@@ -47,16 +52,17 @@
    (section
     "Generate"
     (list [:p "Use the following form to generate a URL"]
-          [:form {:action (wrap-context-path request "/generate")}
-           [:label "Source"]
-           [:input {:type "text" :name "source"}]
-           [:button {:type "submit"} "Submit"]]
+          (form/form-to [:get "/generate"]
+                        (form/label "source" "Source")
+                        (form/text-field "source")
+                        (form/submit-button "Submit"))
+
           (if-let [source (get (:query-params request) "source")]
-            (let [link (str "/resize/" "150x150" "/s/" (java.net.URLEncoder/encode source))]
+            (let [link (util/url "/resize/" "150x150" "/s/" (util/url-encode source))]
               [:div
-               [:em "Got source, link for the image: " [:a {:href (wrap-context-path request link)} [:code link]]]
+               [:em "Got source, link for the image: " (element/link-to link [:code link])]
                [:br]
-               [:img {:src (wrap-context-path request link)}]
+               (element/image link)
                ]))))))
 
 
